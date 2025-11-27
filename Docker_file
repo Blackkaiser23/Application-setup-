@@ -1,0 +1,24 @@
+# Use a lightweight official Python image as the base
+FROM python:3.9-slim
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the dependencies file and install them
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the application files (backend.py and frontend.html)
+COPY backend.py .
+COPY frontend.html .
+
+# Expose the port the Flask app runs on
+EXPOSE 5000
+
+# Define the command to run the application
+# We use Gunicorn, a production-ready WSGI server, instead of Flask's built-in server.
+# You would need to add 'gunicorn' to your requirements.txt for this.
+# If you stick to flask's built-in server, use: CMD ["python", "backend.py"]
+
+# Using Flask's built-in server for simplicity in this example
+CMD ["python", "backend.py"]
