@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sip-calculator-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sip-calculator
+  template:
+    metadata:
+      labels:
+        app: sip-calculator
+    spec:
+      containers:
+      - name: sip-calculator-container
+        image: your-docker-hub-username/sip-calculator-app:latest
+        ports:
+        - containerPort: 5000
