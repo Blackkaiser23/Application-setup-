@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIP Calculator</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; border: 1px solid #ccc; border-radius: 10px; }
+        h1 { text-align: center; color: #333; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input[type="number"] { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
+        button { background-color: #4CAF50; color: white; padding: 10px 15px; margin-top: 20px; border: none; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; }
+        button:hover { background-color: #45a049; }
+        #result { margin-top: 20px; padding: 15px; border: 1px solid #ddd; background-color: #f9f9f9; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>📈 SIP Calculator</h1>
+
+    <label for="monthlyInvestment">Monthly Investment (P):</label>
+    <input type="number" id="monthlyInvestment" value="5000" min="100">
+
+    <label for="annualRate">Annual Rate of Return (r) in %:</label>
+    <input type="number" id="annualRate" value="12" min="1" max="100">
+
+    <label for="timePeriod">Time Period (t) in Years:</label>
+    <input type="number" id="timePeriod" value="10" min="1">
+
+    <button onclick="calculateSIP()">Calculate</button>
+
+    <div id="result">
+        <h2>Result:</h2>
+        <p id="totalValue">Future Value: -</p>
+        <p id="investedAmount">Total Invested: -</p>
+        <p id="estimatedGain">Estimated Gain: -</p>
+    </div>
+
+    <script>
+        async function calculateSIP() {
+            const monthlyInvestment = parseFloat(document.getElementById('monthlyInvestment').value);
+            const annualRate = parseFloat(document.getElementById('annualRate').value);
+            const timePeriod = parseFloat(document.getElementById('timePeriod').value);
+
+            if (isNaN(monthlyInvestment) || isNaN(annualRate) || isNaN(timePeriod)) {
+                alert("Please enter valid numbers for all fields.");
+                return;
+            }
+
+            try {
+                // Call the backend API
+                const response = await fetch('/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        monthly_investment: monthlyInvestment,
+                        annual_rate: annualRate,
+                        time_period: timePeriod
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Display the results
+                document.getElementById('totalValue').textContent = `Future Value: ₹${data.future_value.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
+                document.getElementById('investedAmount').textContent = `Total Invested: ₹${data.invested_amount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
+                document.getElementById('estimatedGain').textContent = `Estimated Gain: ₹${data.estimated_gain.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
+
+            } catch (error) {
+                console.error('Error calculating SIP:', error);
+                document.getElementById('totalValue').textContent = 'Future Value: Error calculating.';
+                document.getElementById('investedAmount').textContent = 'Total Invested: -';
+                document.getElementById('estimatedGain').textContent = 'Estimated Gain: -';
+            }
+        }
+    </script>
+</body>
+</html>
